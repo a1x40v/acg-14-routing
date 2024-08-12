@@ -1,5 +1,11 @@
-import { Component, computed, inject, input } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { Component, inject, input } from '@angular/core';
+import {
+  ActivatedRouteSnapshot,
+  ResolveFn,
+  RouterLink,
+  RouterOutlet,
+  RouterStateSnapshot,
+} from '@angular/router';
 
 import { UsersService } from '../users.service';
 
@@ -13,9 +19,22 @@ import { UsersService } from '../users.service';
 export class UserTasksComponent {
   userId = input.required<string>();
   message = input.required<string>();
-  private usersService = inject(UsersService);
+  userName = input.required<string>();
 
-  userName = computed(
-    () => this.usersService.users.find((u) => u.id === this.userId())?.name
-  );
+  // userName = computed(
+  //   () => this.usersService.users.find((u) => u.id === this.userId())?.name
+  // );
 }
+
+export const resolveUserName: ResolveFn<string> = (
+  avtivatedRoute: ActivatedRouteSnapshot,
+  routerState: RouterStateSnapshot
+) => {
+  const usersService = inject(UsersService);
+  const userName =
+    usersService.users.find(
+      (u) => u.id === avtivatedRoute.paramMap.get('userId')
+    )?.name || '';
+
+  return userName;
+};
